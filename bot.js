@@ -9,12 +9,15 @@ bot.on('ready', () => {
 let queue = [];
 let cooldown = false;
 
+let commands = [".help", ".play", ".stop", ".skip", ".queue"];
+
 bot.on("message", msg => {
 	
-	const prefix ="!";
+	const prefix =".";
 	
 	if (!msg.content.startsWith(prefix)) return;
 	if (msg.author.bot) return;
+	
 	
 	//Command cooldown
 	if (cooldown == true) {
@@ -34,10 +37,9 @@ bot.on("message", msg => {
 	if (msg.content.startsWith(prefix + "help")) {
 		msg.channel.sendMessage("" +
 			"__**Help**__\n" +
-			"!play URL - Adds the video to queue\n" +
-			"!stop - Stops the music\n" +
-			"!queue - Lists the current queue\n" +
-			"!clear - Clears the current queue\n" +
+			".play URL - Adds the video to queue\n" +
+			".stop - Stop the music and clear the queue\n" +
+			".queue - Lists the current queue\n" +
 			"\n" +
 			"Hydra Discord channel:  https://discord.gg/UcZc3uX")
 			.then(msg => console.log(`Sent message: ${msg.content}`))
@@ -81,11 +83,34 @@ bot.on("message", msg => {
 									if (queue.length > 0) {
 										play(queue[0][0], connection); //Have no idea how this even works
 									} else {
+										msg.channel.sendMessage("No more songs in queue.")
+											.then(msg => console.log(`Sent message: ${msg.content}`))
+											.catch(console.error);
+										
 										connection.disconnect();
 									}
 									
 									console.log("Stream ended");
 								});
+								
+								bot.on("message", (msg) => {
+									if (msg.content.startsWith(prefix + "skip")) {
+										dispatcher.end();
+										
+										msg.channel.sendMessage("Song skipped!")
+											.then(msg => console.log(`Sent message: ${msg.content}`))
+											.catch(console.error);
+									}
+									if (msg.content.startsWith(prefix + "stop")) {
+										connection.disconnect();
+										queue = [];
+										
+										msg.channel.sendMessage("Playback stopped.")
+											.then(msg => console.log(`Sent message: ${msg.content}`))
+											.catch(console.error);
+									}
+								});
+								
 							}
 							
 						}).catch(console.error);
@@ -112,14 +137,6 @@ bot.on("message", msg => {
 		}
 	}
 	
-	if (msg.content.startsWith(prefix + "stop")) {
-		const voiceChannel = msg.member.voiceChannel;
-		voiceChannel.join().then(connection => {
-			connection.disconnect();
-		});
-		queue = [];
-	}
-	
 	if (msg.content.startsWith(prefix + "queue")) {
 		//List queue
 		if (queue.length > 0) {
@@ -137,13 +154,6 @@ bot.on("message", msg => {
                 .catch(console.error);
 		}
 	}
-
-    if (msg.content.startsWith(prefix + "clear")) {
-		queue = [];
-		msg.channel.sendMessage("Queue cleared!")
-			.then(msg => console.log(`Sent message: ${msg.content}`))
-            .catch(console.error);
-    }
 	
 });
 
