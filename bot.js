@@ -1,15 +1,9 @@
 const Discord = require("discord.js");
 const ytdl = require('ytdl-core');
 const bot = new Discord.Client();
-const Youtube = require("youtube-api");
 
 bot.on('ready', () => {
 	console.log(`Logged in as ${bot.user.username}!`);
-});
-
-Youtube.authenticate({
-	type: "key",
-	key: "AIzaSyCxjNMz0f-0QiU2hxOFmQTW1zEDfcuwG7g"
 });
 
 let queue = [];
@@ -65,9 +59,15 @@ bot.on("message", msg => {
 				if (queue.length <= 0) {
 					try {
 						voiceChannel.join().then(connection => { //Join voice channel
-							queue.push(args[1]);
-							
-							play(queue[0], connection); //First play
+
+							ytdl.getInfo(args[1], (err, info) => {
+                                queue.push([args[1], info.title]);
+                                console.log("Added url to queue " + queue[0]);
+
+                                play(queue[0][0], connection);
+							});
+
+
 							
 							function play(streamurl, connection) { //Play video function
 								
@@ -79,7 +79,7 @@ bot.on("message", msg => {
 								dispatcher.once("end", () => { //Called when stream ends
 									queue.shift();
 									if (queue.length > 0) {
-										play(queue[0], connection); //Have no idea how this even works
+										play(queue[0][0], connection); //Have no idea how this even works
 									} else {
 										connection.disconnect();
 									}
@@ -95,7 +95,14 @@ bot.on("message", msg => {
 							.catch(console.error);
 					}
 				} else {
-					queue.push(args[1]);
+                    ytdl.getInfo(args[1], (err, info) => {
+                        queue.push([args[1], info.title]);
+
+                        console.log("Added url to queue " + queue[0]);
+                        msg.channel.sendMessage("Added to queue: " + info.title)
+                            .then(msg => console.log(`Sent message: ${msg.content}`))
+                            .catch(console.error);
+                    });
 				}
 			} else {
 				msg.reply("That URL is not valid, it must be a full Youtube URL."); //If url is invalid
@@ -110,12 +117,18 @@ bot.on("message", msg => {
 		voiceChannel.join().then(connection => {
 			connection.disconnect();
 		});
+		queue = [];
 	}
 	
 	if (msg.content.startsWith(prefix + "queue")) {
 		//List queue
 		if (queue.length > 0) {
-            msg.channel.sendMessage(queue.join(", "))
+
+			let queuelist = "";
+			for (let i = 0; i<queue.length; i++) {
+				queuelist += i+1 + ". " + queue[i][1] + "\n";
+			}
+            msg.channel.sendMessage(queuelist)
                 .then(msg => console.log(`Sent message: ${msg.content}`))
                 .catch(console.error);
         } else {
@@ -134,20 +147,4 @@ bot.on("message", msg => {
 	
 });
 
-/*
-function getVideoTitle(id) {
-	let params = {
-		id: id,
-		part: "snippet",
-		maxResults: 1
-	};
-	Youtube.videos.list(params, (err, res) => {
-		if (err) {
-			return console.log("Encountered error:\n" + err)
-		} else {
-			return res.items[0].snippet.title;
-		}
-	});
-}
-*/
-bot.login('MjY2ODcyMDQ2OTIxNzExNjE2.C1D_eg.VxbvB5XXfTujvOfhFMaaAd0LmJs');
+bot.login('MjY2ODU4MjM4Mzc5NTU2ODg1.C1a69Q.HmbNjQMMTfzx4Qkpi_hVULrIrqg');
