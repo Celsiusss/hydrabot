@@ -78,6 +78,12 @@ bot.on("message", msg => {
 								const stream = ytdl(streamurl, {filter: 'audioonly'}); //Play :D
 								const dispatcher = connection.playStream(stream, streamOptions);
 								
+								ytdl.getInfo(args[1], (err, info) => {
+									msg.channel.sendMessage("Now playing: " + info.title)
+										.then(msg => console.log(`Sent message: ${msg.content}`))
+										.catch(console.error);
+								});
+								
 								dispatcher.once("end", () => { //Called when stream ends
 									queue.shift();
 									if (queue.length > 0) {
@@ -142,8 +148,11 @@ bot.on("message", msg => {
 		if (queue.length > 0) {
 
 			let queuelist = "";
-			for (let i = 0; i<queue.length; i++) {
-				queuelist += i+1 + ". " + queue[i][1] + "\n";
+			
+			queuelist += "Currently playing: " + queue[0[1]];
+			
+			for (let i = 1; i<queue.length; i++) {
+				queuelist += i + ". " + queue[i][1] + "\n";
 			}
             msg.channel.sendMessage(queuelist)
                 .then(msg => console.log(`Sent message: ${msg.content}`))
