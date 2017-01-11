@@ -1,10 +1,17 @@
 const Discord = require("discord.js");
 const ytdl = require('ytdl-core');
+const search = new require("youtube-search");
 const bot = new Discord.Client();
+const fs = new require("fs");
 
 bot.on('ready', () => {
 	console.log(`Logged in as ${bot.user.username}!`);
 });
+
+let searchOptions = {
+	maxResults: 1,
+	key: "AIzaSyCxjNMz0f-0QiU2hxOFmQTW1zEDfcuwG7g"
+}
 
 let queue = [];
 let cooldown = false;
@@ -136,7 +143,11 @@ bot.on("message", msg => {
                     });
 				}
 			} else {
-				msg.reply("That URL is not valid, it must be a full Youtube URL."); //If url is invalid
+				search(msg.content.substring(prefix.length + "play".length), searchOptions, (err, results) => {
+					if (err) return console.log(err);
+					 msg.reply(results.map().get("link"));
+
+				});
 			}
 		} else {
 			msg.reply("I need a Youtube URL for that."); //If no arguments is given
@@ -166,4 +177,4 @@ bot.on("message", msg => {
 	
 });
 
-bot.login('MjY2ODcyMDQ2OTIxNzExNjE2.C1D_eg.VxbvB5XXfTujvOfhFMaaAd0LmJs');
+bot.login('MjY2ODU4MjM4Mzc5NTU2ODg1.C1fQkQ.8KwRGuxWFCDNexAqbZSreN1MokQ');
