@@ -23,7 +23,6 @@ bot.on("message", (msg) => {
 	if (!msg.content.startsWith(prefix)) return;
 	if (msg.author.bot) return;
 	
-	
 	//Command cooldown
 	function cooldown() {
 		
@@ -89,11 +88,11 @@ bot.on("message", (msg) => {
 							function queueAdd(add, callback) {
 								if (add == true) {
 									ytdl.getInfo(args[1], (err, info) => {
-										queue.push([args[1], info.title]);
-										console.log("Added url to queue " + queue[0]);
+										queue.push([args[1], info.title, info.length_seconds]);
+										console.log("Added url to queue " + queue[0] + "(" + timestamp(info.length_seconds) + ")");
 										
 										if (queue.length > 1) {
-											msg.channel.sendMessage("Song added to queue: " + queue[0][1])
+											msg.channel.sendMessage("Song added to queue: " + queue[0][1] + " (" + timestamp(info.length_seconds) + ")")
 												.then(msg => console.log(`Sent message: ${msg.content}`))
 												.catch(console.error);
 										}
@@ -110,9 +109,11 @@ bot.on("message", (msg) => {
 								
 								queueAdd(add, () => {
 									
-									msg.channel.sendMessage("Now playing: " + queue[0][1])
-										.then(msg => console.log(`Sent message: ${msg.content}`))
-										.catch(console.error);
+									ytdl.getInfo(args[1], (err, info) => {
+										msg.channel.sendMessage("Now playing: " + queue[0][1] + " (" + timestamp(info.length_seconds) + ")")
+											.then(msg => console.log(`Sent message: ${msg.content}`))
+											.catch(console.error);
+									});
 									
 									const stream = ytdl(streamurl, {filter: 'audioonly'}); //Play :D
 									const dispatcher = connection.playStream(stream, streamOptions);
@@ -181,11 +182,12 @@ bot.on("message", (msg) => {
 							return;
 						}
 						queue.push([args[1], info.title]);
-						
-						console.log("Added url to queue " + queue[0]);
-						msg.channel.sendMessage("Song added to queue: " + info.title)
-							.then(msg => console.log(`Sent message: ${msg.content}`))
-							.catch(console.error);
+						ytdl.getInfo(args[1], (err, info) => {
+							console.log("Added url to queue " + queue[0] + "(" + timestamp(info.length_seconds) + ")");
+							msg.channel.sendMessage("Song added to queue: " + info.title + " (" + timestamp(info.length_seconds) + ")")
+								.then(msg => console.log(`Sent message: ${msg.content}`))
+								.catch(console.error);
+						});
 					});
 				}
 			}
@@ -215,6 +217,15 @@ bot.on("message", (msg) => {
 		}
 	}
 	
+	function timestamp(time) {
+		let minutes = Math.floor(time / 60);
+		let seconds = time - minutes * 60;
+		function str_pad_left(string,pad,length) {
+			return (new Array(length+1).join(pad)+string).slice(-length);
+		}
+		return str_pad_left(minutes,'0',2)+':'+str_pad_left(seconds,'0',2);
+	}
+	
 });
 
-bot.login('MjY2ODcyMDQ2OTIxNzExNjE2.C1D_eg.VxbvB5XXfTujvOfhFMaaAd0LmJs');
+bot.login('MjY2ODU4MjM4Mzc5NTU2ODg1.C1kmiw.WFaYryYUx5gP-YSP5FHGRf4z84E');
