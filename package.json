@@ -10,8 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.0.0",
-    "jQuery": "^1.7.4",
-    "jquery": "^3.1.1",
     "jsdom": "^9.9.1",
     "node-opus": "^0.2.4",
     "youtube-api": "^2.0.6",

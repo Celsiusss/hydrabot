@@ -5,6 +5,7 @@ const bot = new Discord.Client();
 const fs = new require("fs");
 
 bot.on('ready', () => {
+	bot.user.setGame(".help");
 	console.log(`Logged in as ${bot.user.username}!`);
 });
 
@@ -13,8 +14,13 @@ let searchOptions = {
 	key: "AIzaSyCxjNMz0f-0QiU2hxOFmQTW1zEDfcuwG7g"
 };
 
-let queue = [];
+global.queue = {
+	test: "test"
+};
 let timer = false;
+
+//let guildID = msg.guild.id;
+//queue[guildID] = [];
 
 bot.on("message", (msg) => {
 	
@@ -22,10 +28,16 @@ bot.on("message", (msg) => {
 	
 	if (!msg.content.startsWith(prefix)) return;
 	if (msg.author.bot) return;
-	
+
+	let guildID = msg.guild.id;
+
+	if (!queue[msg.guild.id]) {
+		queue[msg.guild.id] = [];
+	}
+
 	//Command cooldown
 	function cooldown() {
-		
+
 		if (timer == true) {
 			msg.channel.sendMessage("You're sending commands too quickly!")
 				.then(msg => console.log(`Sent message: ${msg.content}`))
@@ -35,14 +47,14 @@ bot.on("message", (msg) => {
 		function setCooldown(value) {
 			return timer = value;
 		}
-		
+
 		setCooldown(true);
 		setTimeout(() => {
 			setCooldown(false);
 		}, 3000);
 		return timer;
 	}
-	
+
 	if (msg.content.startsWith(prefix + "help")) {
 		msg.channel.sendMessage("" +
 			"__**Help**__\n" +
@@ -54,118 +66,121 @@ bot.on("message", (msg) => {
 			.then(msg => console.log(`Sent message: ${msg.content}`))
 			.catch(console.error);
 	}
-	
+
 	//Play command
 	if (msg.content.startsWith(prefix + "play")) {
 		//if (cooldown()) return;
-	
+
 		let args = msg.content.split(" ");
-		
+
 		if (args.length > 1) {
 			if (!args[1].startsWith("http://www.youtube.com/watch?v=") || //Check url
 				!args[1].startsWith("https://www.youtube.com/watch?v=")) {
-				
+
 				search(msg.content.substring(prefix.length + "play".length), searchOptions, (err, results) => {
 					if (err) return console.log(err);
-					
+
 					args[1] = results[0].link;
 					start();
 				});
 			} else start();
-			
+
 			function start() {
-				
+
 				const streamOptions = {seek: 0, volume: 1};
 				const voiceChannel = msg.member.voiceChannel;
-				
-				if (queue.length <= 0) {
-					
+
+				if (queue[msg.guild.id].length == 0) {
+
 					try {
 						voiceChannel.join().then(connection => { //Join voice channel
-							
+
 							play(true, args[1], connection);
-							
+
 							function queueAdd(add, callback) {
 								if (add == true) {
 									ytdl.getInfo(args[1], (err, info) => {
-										queue.push([args[1], info.title, info.length_seconds]);
-										console.log("Added url to queue " + queue[0] + "(" + timestamp(info.length_seconds) + ")");
-										
-										if (queue.length > 1) {
-											msg.channel.sendMessage("Song added to queue: " + queue[0][1] + " (" + timestamp(info.length_seconds) + ")")
-												.then(msg => console.log(`Sent message: ${msg.content}`))
-												.catch(console.error);
+										if (err) {
+											console.log(err);
+											msg.channel.sendMessage("Error adding song, please try again.")
+													.then(msg => console.log(`Sent message: ${msg.content}`))
+													.catch(console.error);
+											return;
 										}
+										if (queue[msg.guild.id].push([args[1], info.title + " (" + timestamp(info.length_seconds) + ")"])) {
+											console.log("Added url to queue " + queue[msg.guild.id][0][1]);
+											msg.channel.sendMessage("Song added to queue: " + queue[msg.guild.id][queue[msg.guild.id].length - 1][1])
+													.then(msg => console.log(`Sent message: ${msg.content}`))
+													.catch(console.error);
+
+										} else console.log("Error adding song to queue.");
+
 										callback();
 									});
-								} else {
-									callback();
-								}
+								} else callback();
 							}
-							
+
 							function play(add, streamurl, connection) { //Play video function
-								
+
 								console.log('Playing stream ' + streamurl);
-								
+
 								queueAdd(add, () => {
-									
-									ytdl.getInfo(args[1], (err, info) => {
-										msg.channel.sendMessage("Now playing: " + queue[0][1] + " (" + timestamp(info.length_seconds) + ")")
+
+									msg.channel.sendMessage("Now playing: " + queue[msg.guild.id][0][1])
 											.then(msg => console.log(`Sent message: ${msg.content}`))
 											.catch(console.error);
-									});
-									
+
 									const stream = ytdl(streamurl, {filter: 'audioonly'}); //Play :D
 									const dispatcher = connection.playStream(stream, streamOptions);
-									
+
 									dispatcher.on("end", () => { //Called when stream ends
-										queue.shift();
-										if (queue.length > 0) {
-											play(false, queue[0][0], connection); //Have no idea how this even works
+										queue[msg.guild.id].shift();
+										if (queue[msg.guild.id].length > 0) {
+											play(false, queue[msg.guild.id][0][0], connection); //Have no idea how this even works
 										} else {
 											msg.channel.sendMessage("No more songs in queue.")
 												.then(msg => console.log(`Sent message: ${msg.content}`))
 												.catch(console.error);
-											
+
 											connection.disconnect();
 										}
-										
+
 										console.log("Stream ended");
 									});
 									com();
-									
+
 									function com() {
 										bot.once("message", (message) => {
 											let end = false;
-											
+
 											if (message.content.startsWith(prefix + "skip")) {
 												message.channel.sendMessage("Song skipped!")
 													.then(message => console.log(`Sent message: ${message.content}`))
 													.catch(console.error);
-												
+
 												end = true;
 												dispatcher.end();
 											}
-											
-											if (message.content.startsWith(prefix + "stop")) {
+
+											if (message.content.startsWith(prefix + "stop") && message.guild.id == guildID) {
 												end = false;
-												
+
 												connection.disconnect();
-												queue = [];
-												
+												queue[msg.guild.id] = [];
+
 												message.channel.sendMessage("Playback stopped.")
-													.then(msg => console.log(`Sent message: ${message.content}`))
+													.then(msg => console.log(`Sent message: ${msg.content}`))
 													.catch(console.error);
-												
+
 												end = true;
 											} else if (!end) return com();
 										});
 									}
-									
+
 								});
-								
+
 							}
-							
+
 						}).catch(console.error);
 					} catch (e) { //I should not do it this way, but meh
 						msg.channel.sendMessage("Join a voice channel before jamming")
@@ -181,13 +196,12 @@ bot.on("message", (msg) => {
 								.catch(console.error);
 							return;
 						}
-						queue.push([args[1], info.title]);
-						ytdl.getInfo(args[1], (err, info) => {
-							console.log("Added url to queue " + queue[0] + "(" + timestamp(info.length_seconds) + ")");
-							msg.channel.sendMessage("Song added to queue: " + info.title + " (" + timestamp(info.length_seconds) + ")")
+						queue[msg.guild.id].push([args[1], info.title + " (" + timestamp(info.length_seconds) + ")"]);
+
+						console.log("Added url to queue " + queue[msg.guild.id][0]);
+						msg.channel.sendMessage("Song added to queue: " + queue[msg.guild.id][queue[msg.guild.id].length - 1][1])
 								.then(msg => console.log(`Sent message: ${msg.content}`))
 								.catch(console.error);
-						});
 					});
 				}
 			}
@@ -195,25 +209,25 @@ bot.on("message", (msg) => {
 			msg.reply("I need a Youtube URL for that."); //If no arguments is given
 		}
 	}
-	
+
 	if (msg.content.startsWith(prefix + "queue")) {
 		//List queue
-		if (queue.length > 0) {
+		if (queue[msg.guild.id].length != 0) {
 
 			let queuelist = "";
-			
-			queuelist += "Currently playing: " + queue[0][1] + "\n";
-			
-			for (let i = 1; i<queue.length; i++) {
-				queuelist += i + ". " + queue[i][1] + "\n";
+
+			queuelist += "Currently playing: " + queue[msg.guild.id][0][1] + "\n";
+
+			for (let i = 1; i<queue[msg.guild.id].length; i++) {
+				queuelist += i + ". " + queue[msg.guild.id][i][1] + "\n";
 			}
             msg.channel.sendMessage(queuelist)
                 .then(msg => console.log(`Sent message: ${msg.content}`))
                 .catch(console.error);
-        } else {
-            msg.channel.sendMessage("No videos in queue.")
-                .then(msg => console.log(`Sent message: ${msg.content}`))
-                .catch(console.error);
+		} else {
+			msg.channel.sendMessage("No videos in queue.")
+					.then(msg => console.log(`Sent message: ${msg.content}`))
+					.catch(console.error);
 		}
 	}
 	
