@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.0.0",
-    "jsdom": "^9.9.1",
+    "discordbots": "^1.1.4",
     "node-opus": "^0.2.4",
     "youtube-api": "^2.0.6",
     "youtube-search": "^1.0.7",

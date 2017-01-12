@@ -230,6 +230,23 @@ bot.on("message", (msg) => {
 					.catch(console.error);
 		}
 	}
+
+	if (msg.content.startsWith(prefix + "post")) {
+
+		const DiscordBots = require('discordbots');
+		const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiIxMTAxMDY2NDIzMDkyMDYwMTYiLCJyYW5kIjo1OTIsImlhdCI6MTQ4NDA1NDQyN30.3XLS0U5ZztPdmo3mT0QKezUC3jSJkYGr5MtgDBiZ4Tg';
+		const dbots = new DiscordBots(token);
+		const botid = "266872046921711616";
+
+		let count = bot.guilds.size;
+
+		let stats = {
+			server_count: count
+		};
+
+		dbots.postBotStats(botid, stats);
+
+	}
 	
 	function timestamp(time) {
 		let minutes = Math.floor(time / 60);
@@ -243,3 +260,7 @@ bot.on("message", (msg) => {
 });
 
 bot.login('MjY2ODU4MjM4Mzc5NTU2ODg1.C1kmiw.WFaYryYUx5gP-YSP5FHGRf4z84E');
+
+
+
+
