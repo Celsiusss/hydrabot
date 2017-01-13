@@ -167,7 +167,6 @@ bot.on("message", (msg) => {
 											}
 
 											if (message.content.startsWith(prefix + "stop") && message.guild.id == guildID) {
-												end = false;
 
 												connection.disconnect();
 												queue[msg.guild.id] = [];
@@ -177,7 +176,8 @@ bot.on("message", (msg) => {
 													.catch(console.error);
 
 												end = true;
-											} else if (!end) return com();
+											}
+											if (!end) return com();
 										});
 									}
 
