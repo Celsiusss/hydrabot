@@ -20,7 +20,6 @@ global.queue = {
 	test: "test"
 };
 let timer = false;
-let clevername = "-";
 
 //let guildID = msg.guild.id;
 //queue[guildID] = [];
@@ -28,8 +27,11 @@ let clevername = "-";
 bot.on("message", (msg) => {
 	
 	const prefix =".";
+
+	let id = bot.user.id;
+	let clevername = new RegExp(`^<@!?${id}>`);
 	
-	if (msg.content.startsWith(prefix)) {} else if (msg.content.startsWith(clevername)) {} else return;
+	if (msg.content.startsWith(prefix)) {} else if (clevername.test(msg.content)) {console.log("Yes")} else return;
 	if (msg.author.bot) return;
 
 	let guildID = msg.guild.id;
@@ -64,7 +66,7 @@ bot.on("message", (msg) => {
 			".play URL - Adds the video to queue\n" +
 			".stop - Stop the music and clear the queue\n" +
 			".queue - Lists the current queue\n" +
-				"-your message - Talk to cleverbot!\n" +
+				"@Hydra - Talk to Hydra!\n" +
 			"\n" +
 			"Hydra Discord channel:  https://discord.gg/UcZc3uX")
 			.then(msg => console.log(`Sent message: ${msg.content}`))
@@ -251,13 +253,18 @@ bot.on("message", (msg) => {
 		dbots.postBotStats(botid, stats);
 	}
 
-	if (msg.content.startsWith(clevername)) {
+	if (clevername.test(msg.content)) {
+
+		let string = msg.content;
+		string = msg.content.split(" ");
+		string.shift();
+		string.join(" ");
 
 		clever.setNick(msg.author.username);
 
 		clever.create(function (err, session) {
 			if (err) console.log(err);
-			clever.ask(msg.content.substring(clevername.length), function (err, response) {
+			clever.ask(string, function (err, response) {
 				if (err) console.log(err);
 				msg.channel.sendMessage(response)
 						.then(msg => console.log(`Sent message: ${msg.content}`))
