@@ -19,6 +19,10 @@ let searchOptions = {
 global.queue = {
 	test: "test"
 };
+
+global.dispatchers = new Map();
+global.connections = new Map();
+
 let timer = false;
 
 //let guildID = msg.guild.id;
@@ -35,6 +39,7 @@ bot.on("message", (msg) => {
 	if (msg.author.bot) return;
 
 	let guildID = msg.guild.id;
+	const streamOptions = {seek: 0, volume: 1};
 
 	if (!queue[msg.guild.id]) {
 		queue[msg.guild.id] = [];
@@ -93,7 +98,6 @@ bot.on("message", (msg) => {
 
 			function start() {
 
-				const streamOptions = {seek: 0, volume: 1};
 				const voiceChannel = msg.member.voiceChannel;
 
 				if (queue[msg.guild.id].length == 0) {
@@ -101,91 +105,9 @@ bot.on("message", (msg) => {
 					try {
 						voiceChannel.join().then(connection => { //Join voice channel
 
+							connections.set(guildID, connection);
+
 							play(true, args[1], connection);
-
-							function queueAdd(add, callback) {
-								if (add == true) {
-									ytdl.getInfo(args[1], (err, info) => {
-										if (err) {
-											console.log(err);
-											msg.channel.sendMessage("Error adding song, please try again.")
-													.then(msg => console.log(`Sent message: ${msg.content}`))
-													.catch(console.error);
-											return;
-										}
-										if (queue[msg.guild.id].push([args[1], info.title + " (" + timestamp(info.length_seconds) + ")"])) {
-											console.log("Added url to queue " + queue[msg.guild.id][0][1]);
-											msg.channel.sendMessage("Song added to queue: " + queue[msg.guild.id][queue[msg.guild.id].length - 1][1])
-													.then(msg => console.log(`Sent message: ${msg.content}`))
-													.catch(console.error);
-
-										} else console.log("Error adding song to queue.");
-
-										callback();
-									});
-								} else callback();
-							}
-
-							function play(add, streamurl, connection) { //Play video function
-
-								console.log('Playing stream ' + streamurl);
-
-								queueAdd(add, () => {
-
-									msg.channel.sendMessage("Now playing: " + queue[msg.guild.id][0][1])
-											.then(msg => console.log(`Sent message: ${msg.content}`))
-											.catch(console.error);
-
-									const stream = ytdl(streamurl, {filter: 'audioonly'}); //Play :D
-									const dispatcher = connection.playStream(stream, streamOptions);
-
-									dispatcher.on("end", () => { //Called when stream ends
-										queue[msg.guild.id].shift();
-										if (queue[msg.guild.id].length > 0) {
-											play(false, queue[msg.guild.id][0][0], connection); //Have no idea how this even works
-										} else {
-											msg.channel.sendMessage("No more songs in queue.")
-												.then(msg => console.log(`Sent message: ${msg.content}`))
-												.catch(console.error);
-
-											connection.disconnect();
-										}
-
-										console.log("Stream ended");
-									});
-									com();
-
-									function com() {
-										bot.once("message", (message) => {
-											let end = false;
-
-											if (message.content.startsWith(prefix + "skip")) {
-												message.channel.sendMessage("Song skipped!")
-													.then(message => console.log(`Sent message: ${message.content}`))
-													.catch(console.error);
-
-												end = true;
-												dispatcher.end();
-											}
-
-											if (message.content.startsWith(prefix + "stop") && message.guild.id == guildID) {
-
-												connection.disconnect();
-												queue[msg.guild.id] = [];
-
-												message.channel.sendMessage("Playback stopped.")
-													.then(msg => console.log(`Sent message: ${msg.content}`))
-													.catch(console.error);
-
-												end = true;
-											}
-											if (!end) return com();
-										});
-									}
-
-								});
-
-							}
 
 						}).catch(console.error);
 					} catch (e) { //I should not do it this way, but meh
@@ -251,7 +173,7 @@ bot.on("message", (msg) => {
 		};
 
 		msg.channel.sendMessage("" +
-				"Hydra is online at " + count + " servers!")
+				"Hydra is online on " + count + " servers!")
 				.then(msg => console.log(`Sent message: ${msg.content}`))
 				.catch(console.error);
 
@@ -277,6 +199,86 @@ bot.on("message", (msg) => {
 			});
 		});
 	}
+
+	if (dispatchers.get(msg.guild.id) != undefined) {
+		if (msg.content.startsWith(prefix + "skip")) {
+
+			msg.channel.sendMessage("Song skipped!")
+					.then(message => console.log(`Sent message: ${message.content}`))
+					.catch(console.error);
+			dispatchers.get(msg.guild.id).end();
+		}
+	}
+
+	if (msg.content.startsWith(prefix + "stop")) {
+
+		connections.get(msg.guild.id).disconnect();
+		queue[msg.guild.id] = [];
+
+		msg.channel.sendMessage("Playback stopped.")
+				.then(msg => console.log(`Sent message: ${msg.content}`))
+				.catch(console.error);
+
+	}
+
+	if (dispatchers.get(msg.guild.id) != undefined) {
+
+		dispatchers.get(msg.guild.id).once("end", () => { //Called when stream ends
+			queue[msg.guild.id].shift();
+
+			if (queue[msg.guild.id].length > 0) {
+				play(false, queue[msg.guild.id][0][0], connections.get(msg.guild.id)); //Have no idea how this even works
+			} else {
+				msg.channel.sendMessage("No more songs in queue.")
+						.then(msg => console.log(`Sent message: ${msg.content}`))
+						.catch(console.error);
+
+				connections.get(msg.guild.id).disconnect();
+			}
+
+			console.log("Stream ended");
+		});
+	}
+
+	function play(add, streamurl, connection) { //Play video function
+
+		console.log('Playing stream ' + streamurl);
+
+		queueAdd(add, streamurl, () => {
+
+			msg.channel.sendMessage("Now playing: " + queue[msg.guild.id][0][1])
+					.then(msg => console.log(`Sent message: ${msg.content}`))
+					.catch(console.error);
+
+			const stream = ytdl(streamurl, {filter: 'audioonly'}); //Play :D
+
+			dispatchers.set(msg.guild.id, connection.playStream(stream, streamOptions));
+
+		});
+	}
+
+	function queueAdd(add, url, callback) {
+		if (add == true) {
+			ytdl.getInfo(url, (err, info) => {
+				if (err) {
+					console.log(err);
+					msg.channel.sendMessage("Error adding song, please try again.")
+							.then(msg => console.log(`Sent message: ${msg.content}`))
+							.catch(console.error);
+					return;
+				}
+				if (queue[msg.guild.id].push([url, info.title + " (" + timestamp(info.length_seconds) + ")"])) {
+					console.log("Added url to queue " + queue[msg.guild.id][0][1]);
+					msg.channel.sendMessage("Song added to queue: " + queue[msg.guild.id][queue[msg.guild.id].length - 1][1])
+							.then(msg => console.log(`Sent message: ${msg.content}`))
+							.catch(console.error);
+
+				} else console.log("Error adding song to queue.");
+
+				callback();
+			});
+		} else callback();
+	}
 	
 	function timestamp(time) {
 		let minutes = Math.floor(time / 60);
@@ -289,4 +291,6 @@ bot.on("message", (msg) => {
 	
 });
 
-bot.login('MjY2ODcyMDQ2OTIxNzExNjE2.C1D_eg.VxbvB5XXfTujvOfhFMaaAd0LmJs');
+
+
+bot.login('MjY2ODU4MjM4Mzc5NTU2ODg1.C1qwzA.WSqKUdmhBHBEDCJ2QhUUgmhkvRY');
