@@ -237,7 +237,7 @@ bot.on("message", (msg) => {
 		}
 	}
 
-	if (msg.content.startsWith(prefix + "post")) {
+	if (msg.content.startsWith(prefix + "stats")) {
 
 		const DiscordBots = require('discordbots');
 		const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiIxMTAxMDY2NDIzMDkyMDYwMTYiLCJyYW5kIjo1OTIsImlhdCI6MTQ4NDA1NDQyN30.3XLS0U5ZztPdmo3mT0QKezUC3jSJkYGr5MtgDBiZ4Tg';
@@ -249,6 +249,11 @@ bot.on("message", (msg) => {
 		let stats = {
 			server_count: count
 		};
+
+		msg.channel.sendMessage("" +
+				"Hydra is online at " + count + " servers!")
+				.then(msg => console.log(`Sent message: ${msg.content}`))
+				.catch(console.error);
 
 		dbots.postBotStats(botid, stats);
 	}
@@ -284,4 +289,4 @@ bot.on("message", (msg) => {
 	
 });
 
-bot.login('MjY2ODcyMDQ2OTIxNzExNjE2.C1D_eg.VxbvB5XXfTujvOfhFMaaAd0LmJs');
+bot.login('MjY2ODU4MjM4Mzc5NTU2ODg1.C1pTEg.2upN84rXe_eBnh--lWj8JOa4X5I');
