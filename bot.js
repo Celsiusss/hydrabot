@@ -3,6 +3,8 @@ const ytdl = require('ytdl-core');
 const search = new require("youtube-search");
 const bot = new Discord.Client();
 const fs = new require("fs");
+var cleverbot = require("cleverbot.io"),
+		clever = new cleverbot("jp6wu9XZbYdoICmo", "54jV1VcMNxGQyc2cdKUFUpjkPVo3bTr2");
 
 bot.on('ready', () => {
 	bot.user.setGame(".help");
@@ -18,6 +20,7 @@ global.queue = {
 	test: "test"
 };
 let timer = false;
+let clevername = "-";
 
 //let guildID = msg.guild.id;
 //queue[guildID] = [];
@@ -26,7 +29,7 @@ bot.on("message", (msg) => {
 	
 	const prefix =".";
 	
-	if (!msg.content.startsWith(prefix)) return;
+	if (msg.content.startsWith(prefix)) {} else if (msg.content.startsWith(clevername)) {} else return;
 	if (msg.author.bot) return;
 
 	let guildID = msg.guild.id;
@@ -61,6 +64,7 @@ bot.on("message", (msg) => {
 			".play URL - Adds the video to queue\n" +
 			".stop - Stop the music and clear the queue\n" +
 			".queue - Lists the current queue\n" +
+				"-your message - Talk to cleverbot!\n" +
 			"\n" +
 			"Hydra Discord channel:  https://discord.gg/UcZc3uX")
 			.then(msg => console.log(`Sent message: ${msg.content}`))
@@ -245,7 +249,21 @@ bot.on("message", (msg) => {
 		};
 
 		dbots.postBotStats(botid, stats);
+	}
 
+	if (msg.content.startsWith(clevername)) {
+
+		clever.setNick(msg.author.username);
+
+		clever.create(function (err, session) {
+			if (err) console.log(err);
+			clever.ask(msg.content.substring(clevername.length), function (err, response) {
+				if (err) console.log(err);
+				msg.channel.sendMessage(response)
+						.then(msg => console.log(`Sent message: ${msg.content}`))
+						.catch(console.error);
+			});
+		});
 	}
 	
 	function timestamp(time) {
@@ -259,8 +277,4 @@ bot.on("message", (msg) => {
 	
 });
 
-bot.login('MjY2ODU4MjM4Mzc5NTU2ODg1.C1kmiw.WFaYryYUx5gP-YSP5FHGRf4z84E');
-
-
-
-
+bot.login('MjY2ODcyMDQ2OTIxNzExNjE2.C1D_eg.VxbvB5XXfTujvOfhFMaaAd0LmJs');

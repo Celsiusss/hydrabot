@@ -9,6 +9,7 @@
   "author": "Celsiuss",
   "license": "ISC",
   "dependencies": {
+    "cleverbot.io": "^1.0.4",
     "discord.js": "^11.0.0",
     "discordbots": "^1.1.4",
     "node-opus": "^0.2.4",
