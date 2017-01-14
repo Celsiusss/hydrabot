@@ -14,7 +14,7 @@ bot.on('ready', () => {
 
 	(function loop (i) {
 		setTimeout(function () {
-			//guilds.set(bot.guilds.size);
+			guilds.set(bot.guilds.size);
 			if (true) {
 				loop(i);
 			}
