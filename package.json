@@ -12,6 +12,7 @@
     "cleverbot.io": "^1.0.4",
     "discord.js": "^11.0.0",
     "discordbots": "^1.1.4",
+    "jsonfile": "^2.4.0",
     "node-opus": "^0.2.4",
     "pmx": "^0.6.8",
     "youtube-api": "^2.0.6",

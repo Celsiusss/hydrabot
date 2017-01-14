@@ -3,13 +3,40 @@ const ytdl = require('ytdl-core');
 const search = new require("youtube-search");
 const bot = new Discord.Client();
 const fs = new require("fs");
+const path = require("path");
 const probe = require('pmx').probe();
+const jsonfile = require("jsonfile");
 var cleverbot = require("cleverbot.io"),
 		clever = new cleverbot("jp6wu9XZbYdoICmo", "54jV1VcMNxGQyc2cdKUFUpjkPVo3bTr2");
 
 bot.on('ready', () => {
 	bot.user.setGame(".help");
+
+	(function loop (i) {
+		setTimeout(function () {
+			//guilds.set(bot.guilds.size);
+			if (true) {
+				loop(i);
+			}
+		}, 1000);
+	})(10);
+
 	console.log(ct() + `Logged in as ${bot.user.username}!`);
+});
+
+fs.readFile("config.json", (err, data) => {
+	if (err) {
+
+		let obj = {
+			discordToken: "TOKEN"
+		};
+
+		jsonfile.writeFile("config.json", obj, (err) => { console.log(err) })
+	} else {
+		config = require("./config.json");
+
+		bot.login(config.discordToken);
+	}
 });
 
 let searchOptions = {
@@ -27,6 +54,7 @@ let voices = new Map();
 let streams = new Map();
 
 let timer = false;
+let config = "ERR";
 
 //let guildID = msg.guild.id;
 //queue[guildID] = [];
@@ -36,7 +64,6 @@ let counter = probe.counter({
 });
 let guilds = probe.metric({
 	name: "Guilds",
-	value: bot.guilds.size
 });
 
 bot.on("message", (msg) => {
@@ -324,5 +351,3 @@ function ct() {
 
 	return "[" + h + ":" + m + ":" + s + "] "
 }
-
-bot.login('MjY2ODU4MjM4Mzc5NTU2ODg1.C1qwzA.WSqKUdmhBHBEDCJ2QhUUgmhkvRY');
