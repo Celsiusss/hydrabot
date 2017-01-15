@@ -70,11 +70,11 @@ let guilds = probe.metric({
 
 bot.commands =  new Discord.Collection();
 bot.aliases = new Discord.Collection();
-fs.readdir(path.join("./commands/"), (err, files) => {
+fs.readdir("./commands/", (err, files) => {
 	if (err) console.error(err);
 	log(`Loading a total of ${files.length} commands.`);
 	files.forEach(f => {
-		let props = require(path.join("./commands/",f ));
+		let props = require(`./commands/${f}`);
 		log(`Loading Command: ${props.info.name}. :ok_hand:`);
 		bot.commands.set(props.info.name, props);
 		/*
