@@ -20,7 +20,7 @@ exports.run = (bot, msg, params) => {
 			.then(msg => log(`Sent message: ${msg.content}`))
 			.catch(console.error);
 
-	dbots.postBotStats(botid, stats);
+	dbots.postBotStats(botid, stats, stats.server_count);
 };
 
 exports.info = {

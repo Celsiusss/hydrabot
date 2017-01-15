@@ -5,7 +5,7 @@ exports.run = (bot, msg, params) => {
 	let prefix = ".";
 
 	log(msg.author.username + " (" + msg.author.id + ") issued command: " + msg.content);
-	msg.channel.sendMessage("Invite link for Hydra: https://discordapp.com/oauth2/authorize?client_id=266872046921711616&scope=bot&permissions=2146958463 ")
+	msg.channel.sendMessage(`Invite link for ${bot.user.username}: https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=2146958463`)
 			.then(msg => log("Sent message: " + msg.content))
 			.catch(console.error);
 

@@ -23,7 +23,7 @@ exports.run = (bot, msg, params) => {
 			text: 'Hydra'
 		}
 	})
-			.then(msg => log("Sent message: " + msg.content))
+			.then(msg => log("Sent message: help menu"))
 			.catch(console.error);
 
 };

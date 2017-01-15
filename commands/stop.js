@@ -8,7 +8,7 @@ exports.run = (bot, msg, params) => {
 		connections.get(msg.guild.id).disconnect();
 
 		msg.channel.sendMessage("Playback stopped.")
-				.then(msg => console.log(ct() + `Sent message: ${msg.content}`))
+				.then(msg => log(`Sent message: ${msg.content}`))
 				.catch(console.error);
 	}
 

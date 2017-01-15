@@ -5,6 +5,7 @@ const fs = new require("fs");
 const path = require("path");
 const probe = require('pmx').probe();
 const jsonfile = require("jsonfile");
+const commandCooldown = require("./helpers/commandCooldown.js");
 var cleverbot = require("cleverbot.io"),
 		clever = new cleverbot("jp6wu9XZbYdoICmo", "54jV1VcMNxGQyc2cdKUFUpjkPVo3bTr2");
 
@@ -64,7 +65,7 @@ let guilds = probe.metric({
 	name: "Guilds"
 });
 
-
+let userCooldown = new Map();
 
 
 
@@ -109,8 +110,16 @@ bot.on("message", (msg) => {
 	//let perms = bot.elevation(msg);
 	let cmd;
 
+	if (!userCooldown.get(msg.author.id)) {
+		userCooldown.set(msg.author.id, 0);
+	}
+
 	if (bot.commands.has(command)) {
-		cmd = bot.commands.get(command);
+		if (!commandCooldown(userCooldown.get(msg.author.id))) {
+			userCooldown.set(msg.author.id, Date.now());
+			cmd = bot.commands.get(command);
+		} else msg.channel.sendMessage("You're sending commands too quickly!");
+
 	} else if (bot.aliases.has(command)) {
 		cmd = bot.commands.get(bot.aliases.get(command));
 	}
