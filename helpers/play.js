@@ -25,6 +25,7 @@ module.exports = exports = (msg, add, streamurl, connection) => {
 			dispatchers.get(guildID).once("end", () => { //Called when stream ends
 
 				queue[msg.guild.id].shift();
+				allstreams -= 1;
 				counter.dec();
 
 				if (queue[msg.guild.id].length > 0) {
@@ -41,6 +42,7 @@ module.exports = exports = (msg, add, streamurl, connection) => {
 			});
 			dispatchers.get(msg.guild.id).once("start", () => {
 				counter.inc();
+				allstreams += 1;
 			});
 
 		});

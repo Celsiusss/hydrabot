@@ -56,6 +56,7 @@ global.streams = new Map();
 let timer = false;
 let config = "ERR";
 
+global.allstreams = 0;
 global.counter = probe.counter({
 	name: "Streams"
 });
