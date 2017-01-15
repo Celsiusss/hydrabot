@@ -58,7 +58,7 @@ exports.run = (bot, msg, params) => {
 			} else {
 				ytdl.getInfo(params[0], (err, info) => {
 					if (err) {
-						console.log(ct() + err);
+						log(err);
 						msg.channel.sendMessage("Error adding song, please try again.")
 								.then(msg => log(`Sent message: ${msg.content}`))
 								.catch(console.error);
