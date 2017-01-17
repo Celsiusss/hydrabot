@@ -38,13 +38,18 @@ exports.run = (bot, msg, params) => {
 
 				try {
 					if (voices.get(guildID).joinable) {
-						voices.get(guildID).join().then(connection => { //Join voice channel
+						try {
+                            voices.get(guildID).join().then(connection => { //Join voice channel
 
-							connections.set(guildID, connection);
+                                connections.set(guildID, connection);
 
-							play(msg, true, params[0], connections.get(guildID));
+                                play(msg, true, params[0], connections.get(guildID));
 
-						}).catch(console.error);
+                            }).catch(console.error);
+                        } catch (e) {
+							log(e);
+                            msg.channel.sendMessage("An unknown error occurred while I was trying to join your channel, try again maybe?");
+						}
 					} else {
 						msg.channel.sendMessage("I do not have permission to join your voice channel :(")
 								.then(msg => log(`Sent message: ${msg.content}`))

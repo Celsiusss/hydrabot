@@ -54,7 +54,6 @@ global.connections = new Map();
 global.voices = new Map();
 global.streams = new Map();
 
-let timer = false;
 let config = "ERR";
 
 global.allstreams = 0;
