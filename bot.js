@@ -120,10 +120,8 @@ bot.on("message", (msg) => {
 	if (msg.author.bot) return;
 	
 	
-	if (typeof msg.guild.id != 'undefined' && !msg.guild.id) {
-		if (!queue[msg.guild.id]) {
-			queue[msg.guild.id] = [];
-		}
+	if (!queue[msg.guild.id]) {
+		queue[msg.guild.id] = [];
 	}
 
 
