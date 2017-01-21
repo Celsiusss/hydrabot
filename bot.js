@@ -1,3 +1,4 @@
+require('@risingstack/trace');
 const Discord = require("discord.js");
 const ytdl = require('ytdl-core');
 const bot = new Discord.Client();
@@ -8,8 +9,6 @@ const jsonfile = require("jsonfile");
 const commandCooldown = require("./helpers/commandCooldown.js");
 var cleverbot = require("cleverbot.io"),
 		clever = new cleverbot("jp6wu9XZbYdoICmo", "54jV1VcMNxGQyc2cdKUFUpjkPVo3bTr2");
-
-const heapdump = require('heapdump');;
 
 const log = require("./helpers/log.js");
 
@@ -26,25 +25,6 @@ bot.on('ready', () => {
 	})(10);
 
 	log(`GuideBot: Ready to serve ${bot.users.size} users, in ${bot.channels.size} channels of ${bot.guilds.size} servers.`);
-	
-	heapdump.writeSnapshot(function(err, filename) {
-		log('dump written to', filename);
-	});
-	setTimeout(() => {
-		heapdump.writeSnapshot(function(err, filename) {
-			console.log('dump written to', filename);
-		});
-	}, 1800);
-	setTimeout(() => {
-		heapdump.writeSnapshot(function(err, filename) {
-			console.log('dump written to', filename);
-		});
-	}, 3600);
-	setTimeout(() => {
-		heapdump.writeSnapshot(function(err, filename) {
-			console.log('dump written to', filename);
-		});
-	}, 7200);
 });
 
 fs.readFile("config.json", (err, data) => {
@@ -120,9 +100,11 @@ bot.on("message", (msg) => {
 	if (msg.author.bot) return;
 	
 	
-	if (!queue[msg.guild.id]) {
-		queue[msg.guild.id] = [];
-	}
+	if (msg.guild) {
+		if (!queue[msg.guild.id]) {
+			queue[msg.guild.id] = [];
+		}
+	} else return;
 
 
 	let command = msg.content.split(" ")[0].slice(prefix.length);
