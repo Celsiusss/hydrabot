@@ -19,8 +19,7 @@ exports.run = (bot, msg, params) => {
 	//if (cooldown()) return;
 
 	if (params[0]) {
-		if (!params[0].startsWith("http://www.youtube.com/watch?v=") || //Check url
-				!params[0].startsWith("https://www.youtube.com/watch?v=")) {
+		if (!/https?:\/\/((www\.)?youtube.com\/watch?v=.+)|youtu.be\/.+/) { // Check url
 
 			search(msg.content.substring(prefix.length + "play".length), searchOptions, (err, results) => {
 				if (err) return log(err);

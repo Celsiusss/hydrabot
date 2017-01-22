@@ -40,12 +40,13 @@ fs.readFile("config.json", (err, data) => {
 		jsonfile.writeFile("config.json", obj, (err) => { console.log(err) });
 		process.exit(1);
 	} else {
-		config = require("./config.json");
+		config = JSON.parse(data);
 
 		bot.login(config.discordToken);
 	}
 });
 
+global.skip = {};
 global.queue = {
 	test: "test"
 };
@@ -151,6 +152,4 @@ bot.on("message", (msg) => {
 			});
 		});
 	}
-
-	
 });
