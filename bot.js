@@ -7,7 +7,7 @@ const path = require("path");
 const probe = require('pmx').probe();
 const jsonfile = require("jsonfile");
 const commandCooldown = require("./helpers/commandCooldown.js");
-var cleverbot = require("cleverbot.io"),
+let cleverbot = require("cleverbot.io"),
 		clever = new cleverbot("jp6wu9XZbYdoICmo", "54jV1VcMNxGQyc2cdKUFUpjkPVo3bTr2");
 
 const log = require("./helpers/log.js");
@@ -24,7 +24,7 @@ bot.on('ready', () => {
 		}, 1000);
 	})(10);
 
-	log(`GuideBot: Ready to serve ${bot.users.size} users, in ${bot.channels.size} channels of ${bot.guilds.size} servers.`);
+	log(`Ready to serve ${bot.users.size} users, in ${bot.channels.size} channels of ${bot.guilds.size} servers.`);
 });
 
 fs.readFile("config.json", (err, data) => {
@@ -46,6 +46,7 @@ fs.readFile("config.json", (err, data) => {
 	}
 });
 
+global.skips = {};
 global.queue = {
 	test: "test"
 };
