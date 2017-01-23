@@ -11,8 +11,8 @@ exports.run = (bot, msg, params) => {
 		title: '__**Help**__',
 		description: prefix + 'help - Shows this message.\n' +
 		prefix + "play - Play music from Youtube or song to queue.\n" +
-		prefix + "skip - Skip the current song and play the next one in the queue\n" +
-		prefix + "stop - Stops the music and clears the queue.\n" +
+		prefix + "skip - Vote to skip the current song (50% voters needed to skip)\n" +
+		prefix + "stop - Stops the music and clears the queue. (Owner only)\n" +
 		prefix + "queue - Lists the current songs in the queue\n" +
 		prefix + "stats - Show some stats about Hydra.\n" +
 		"@Hydra - Talk to Hydra!\n" +
