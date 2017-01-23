@@ -15,8 +15,8 @@ exports.run = (bot, msg, params) => {
 		prefix + "stop - Stops the music and clears the queue.\n" +
 		prefix + "queue - Lists the current songs in the queue\n" +
 		prefix + "stats - Show some stats about Hydra.\n" +
-		prefix + "@Hydra - Talk to Hydra!\n" +
-		prefix + "Join Hydra's Discord Server - https://discord.gg/yxzTnWA" ,
+		"@Hydra - Talk to Hydra!\n" +
+		"Join Hydra's Discord Server - https://discord.gg/yxzTnWA",
 		
 
 		timestamp: new Date(),
@@ -24,9 +24,7 @@ exports.run = (bot, msg, params) => {
 			icon_url: bot.user.avatarURL,
 			text: 'Hydra'
 		}
-	})
-			.then(msg => log("Sent message: help menu"))
-			.catch(console.error);
+	}).then(msg => log("Sent message: help menu")).catch(console.error);
 
 };
 
