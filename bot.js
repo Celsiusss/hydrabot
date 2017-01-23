@@ -13,7 +13,7 @@ var cleverbot = require("cleverbot.io"),
 const log = require("./helpers/log.js");
 
 bot.on('ready', () => {
-	bot.user.setGame(".help");
+	bot.user.setGame(".help | hydrabot.xyz");
 
 	(function loop (i) {
 		setTimeout(function () {
