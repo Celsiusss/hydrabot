@@ -6,6 +6,7 @@ exports.run = (bot, msg, params) => {
 	if (msg.author.id === msg.guild.ownerID) {
 		if (dispatchers.get(msg.guild.id)) {
 			queue[msg.guild.id] = [];
+			skips[msg.guild.id] = [];
 			connections.get(msg.guild.id).disconnect();
 			
 			msg.channel.sendMessage("Playback stopped.")

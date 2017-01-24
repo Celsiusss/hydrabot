@@ -8,6 +8,16 @@ exports.run = (bot, msg, params) => {
 	//ALERT Too many if statements below
 	if (msg.member.voiceChannelID) { //Check if connected to voice
 		if (msg.member.voiceChannel.members.get(bot.user.id)) { //Check if user is in same channel as the bot
+			
+			if (msg.author.id === msg.guild.ownerID) { //If the owner does .skip, ignore voting
+				skips[msg.guild.id] = null;
+				msg.channel.sendMessage("Song skipped!")
+					.then(message => log(`Sent message: ${message.content}`))
+					.catch(console.error);
+				dispatchers.get(msg.guild.id).end();
+				return;
+			}
+			
 			if (skips[msg.guild.id]) { //Check if the array is empty or not
 				if (skips[msg.guild.id].indexOf(msg.author.id) === -1) { //If it's not empty, check if the user is not in the array
 					skips[msg.guild.id].push(msg.author.id); //If not, add the user to the array
@@ -23,7 +33,7 @@ exports.run = (bot, msg, params) => {
 					.catch(console.error);
 			}
 			if (skips[msg.guild.id][0] >= req) {
-				skips[msg.guild.id] = [];
+				skips[msg.guild.id] = null;
 				msg.channel.sendMessage("Song skipped!")
 					.then(message => log(`Sent message: ${message.content}`))
 					.catch(console.error);
