@@ -3,7 +3,7 @@ const log = require("../helpers/log.js");
 exports.run = (bot, msg, params) => {
 	log(msg.author.username + " (" + msg.author.id + ") issued command: " + msg.content);
 	let perc = 0.5;
-	let req = 2;//Math.ceil((msg.member.voiceChannel.members.size-1) * perc);
+	let req = Math.ceil((msg.member.voiceChannel.members.size-1) * perc);
 	
 	//ALERT Too many if statements below
 	if (msg.member.voiceChannelID) { //Check if connected to voice
