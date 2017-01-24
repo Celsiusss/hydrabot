@@ -3,7 +3,7 @@ const log = require("../helpers/log.js");
 exports.run = (bot, msg, params) => {
 	log(msg.author.username + " (" + msg.author.id + ") issued command: " + msg.content);
 
-	if (msg.author.id === msg.guild.ownerID) {
+	if (msg.author.id === msg.guild.ownerID && !dispatchers.get(msg.guild.id)) {
 		if (dispatchers.get(msg.guild.id)) {
 			queue[msg.guild.id] = [];
 			skips[msg.guild.id] = null;
