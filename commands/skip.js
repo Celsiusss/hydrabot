@@ -2,11 +2,12 @@ const log = require("../helpers/log.js");
 
 exports.run = (bot, msg, params) => {
 	log(msg.author.username + " (" + msg.author.id + ") issued command: " + msg.content);
-	let perc = 0.5;
-	let req = Math.ceil((msg.member.voiceChannel.members.size-1) * perc);
 	
 	//ALERT Too many if statements below
 	if (msg.member.voiceChannelID && dispatchers.get(msg.guild.id)) { //Check if connected to voice
+        let perc = 0.5;
+        let req = Math.ceil((msg.member.voiceChannel.members.size-1) * perc);
+
 		if (msg.member.voiceChannel.members.get(bot.user.id)) { //Check if user is in same channel as the bot
 			
 			if (msg.author.id === msg.guild.ownerID) { //If the owner does .skip, ignore voting
