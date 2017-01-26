@@ -4,7 +4,7 @@ exports.run = (bot, msg, params) => {
 	log(msg.author.username + " (" + msg.author.id + ") issued command: " + msg.content);
 	
 	//ALERT Too many if statements below
-	if (msg.member.voiceChannelID && dispatchers.get(msg.guild.id)) { //Check if connected to voice
+	if (msg.member && dispatchers.get(msg.guild.id)) { //Check if connected to voice
         let perc = 0.5;
         let req = Math.ceil((msg.member.voiceChannel.members.size-1) * perc);
 
