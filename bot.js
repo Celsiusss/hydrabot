@@ -13,7 +13,7 @@ let cleverbot = require("cleverbot.io"),
 const log = require("./helpers/log.js");
 
 bot.on('ready', () => {
-	bot.user.setGame(".help");
+	bot.user.setGame(".help | hydra-bot.xyz");
 
 	(function loop (i) {
 		setTimeout(function () {
@@ -27,24 +27,6 @@ bot.on('ready', () => {
 	log(`Ready to serve ${bot.users.size} users, in ${bot.channels.size} channels of ${bot.guilds.size} servers.`);
 });
 
-fs.readFile("config.json", (err, data) => {
-	if (err) {
-		log("Config file does not exist, creating one.");
-
-		let obj = {
-			discordToken: "TOKEN",
-			discordBotsToken: "TOKEN"
-		};
-
-		jsonfile.spaces = 4;
-		jsonfile.writeFile("config.json", obj, (err) => { console.log(err) });
-		process.exit(1);
-	} else {
-		config = require("./config.json");
-
-		bot.login(config.discordToken);
-	}
-});
 
 global.skips = {};
 global.queue = {
@@ -127,7 +109,29 @@ bot.on("message", (msg) => {
 		cmd = bot.commands.get(bot.aliases.get(command));
 	}
 	if (cmd) {
-		cmd.run(bot, msg, params);
+        let guildsdb = require("./models/guilds");
+		guildsdb.find({guildID: msg.guild.id}, {}, {lean: true}, (err, guild) => {
+			if (guild[0].guildID == msg.guild.id) {
+
+				let role = msg.guild.roles.find('name', guild[0].permissions[command]);
+
+				if (role.comparePositionTo(msg.member.highestRole) >= 0) {
+                    cmd.run(bot, msg, params);
+				} else {
+                    msg.channel.sendMessage("You don't have permssion forthis command.")
+                        .then(message => log(`Sent message: ${message.content}`))
+                        .catch(console.error);
+                }
+
+
+
+			} else {
+                msg.channel.sendMessage("This server is not configured!\n" +
+					"Ask the server owner to configure the server at http://hydra-bot.xyz/")
+                    .then(message => log(`Sent message: ${message.content}`))
+                    .catch(console.error);
+			}
+		});
 	}
 
 
@@ -153,5 +157,6 @@ bot.on("message", (msg) => {
 		});
 	}
 
-	
 });
+
+bot.login(config.discordToken);
