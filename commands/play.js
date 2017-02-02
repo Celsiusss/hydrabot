@@ -48,15 +48,15 @@ exports.run = (bot, msg, params) => {
                             }).catch(console.error);
                         } catch (e) {
 							log(e);
-                            msg.channel.sendMessage("An unknown error occurred while I was trying to join your channel, try again maybe?");
+                            msg.channel.sendMessage("An unknown error occured connecting to your voice channel. :disappointed_relieved:");
 						}
 					} else {
-						msg.channel.sendMessage("I do not have permission to join your voice channel :(")
+						msg.channel.sendMessage("I don't have permission to join your voice channel. :fire: :(")
 								.then(msg => log(`Sent message: ${msg.content}`))
 								.catch(console.error);
 					}
 				} catch (e) { //I should not do it this way, but meh
-					msg.channel.sendMessage("Join a voice channel before jamming")
+					msg.channel.sendMessage("Join a voice channel before jamming. :guitar:")
 							.then(msg => log(`Sent message: ${msg.content}`))
 							.catch(console.error);
 				}
@@ -64,7 +64,7 @@ exports.run = (bot, msg, params) => {
 				ytdl.getInfo(params[0], (err, info) => {
 					if (err) {
 						log(err);
-						msg.channel.sendMessage("Error adding song, please try again.")
+						msg.channel.sendMessage("Error adding song, please try again. :question:")
 								.then(msg => log(`Sent message: ${msg.content}`))
 								.catch(console.error);
 						return;
