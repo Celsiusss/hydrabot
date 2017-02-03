@@ -109,32 +109,27 @@ bot.on("message", (msg) => {
 		cmd = bot.commands.get(bot.aliases.get(command));
 	}
 	if (cmd) {
+		if (command == 'makedb') {
+			cmd.run(bot, msg, params);
+		}
         let guildsdb = require("./models/guilds");
 		guildsdb.find({guildID: msg.guild.id}, {}, {lean: true}, (err, guild) => {
-			if (guild[0].guildID == msg.guild.id) {
-
-				let role = msg.guild.roles.find('name', guild[0].permissions[command]);
-
-				if (role.comparePositionTo(msg.member.highestRole) >= 0) {
-                    cmd.run(bot, msg, params);
-				} else {
-                    msg.channel.sendMessage("You don't have permssion forthis command.")
-                        .then(message => log(`Sent message: ${message.content}`))
-                        .catch(console.error);
-                }
-
-
-
-			} else {
-                msg.channel.sendMessage("This server is not configured!\n" +
+			if (!guild[0]) {
+				msg.channel.sendMessage("This server is not configured!\n" +
 					"Ask the server owner to configure the server at http://hydra-bot.xyz/")
-                    .then(message => log(`Sent message: ${message.content}`))
-                    .catch(console.error);
+					.then(message => log(`Sent message: ${message.content}`))
+					.catch(console.error);
+				
+			} else if (guild[0].guildID == msg.guild.id) {
+				
+				let role = msg.guild.roles.find('name', guild[0].permissions[command]);
+				if (role.position <= msg.member.highestRole.position || role.name == '@everyone') {
+					cmd.run(bot, msg, params);
+				}
 			}
 		});
 	}
-
-
+	
 
 	if (clevername.test(msg.content)) {
 		console.log(msg.author.username + " (" + msg.author.id + ") issued command: " + msg.content);

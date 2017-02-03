@@ -3,4 +3,5 @@ node_modules
 config.json
 hydrabot.iml
 data
-
+npm-debug.log
+webapp/node_modules
