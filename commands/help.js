@@ -5,7 +5,7 @@ exports.run = (bot, msg, params) => {
 	let prefix = ".";
 
 	log(msg.author.username + " (" + msg.author.id + ") issued command: " + msg.content);
-	msg.channel.sendEmbed( {
+	msg.author.sendEmbed( {
 		color: 3447003,
 
 		title: '__**Help**__',
@@ -15,6 +15,7 @@ exports.run = (bot, msg, params) => {
 		prefix + "stop - Stops the music and clears the queue. (Owner only)\n" +
 		prefix + "queue - Lists the current songs in the queue\n" +
 		prefix + "stats - Show some stats about Hydra.\n" +
+		prefix + "ping - See if Hydra is online.\n" +
 		"@Hydra - Talk to Hydra!\n" +
 		"Join Hydra's Discord Server - https://discord.gg/yxzTnWA",
 		
@@ -24,7 +25,10 @@ exports.run = (bot, msg, params) => {
 			icon_url: bot.user.avatarURL,
 			text: 'Hydra'
 		}
-	}).then(msg => log("Sent message: help menu")).catch(console.error);
+	}).then(msg => log("Sent DM: help menu")).catch(console.error);
+	msg.channel.sendMessage(":mailbox_with_mail:")
+		.then(message => log(`Sent message: ${message.content}`))
+		.catch(console.error);
 
 };
 
