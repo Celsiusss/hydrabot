@@ -5,7 +5,7 @@ exports.run = (bot, msg, params) => {
 	let prefix = ".";
 
 	log(msg.author.username + " (" + msg.author.id + ") issued command: " + msg.content);
-	msg.channel.sendEmbed( {
+	msg.author.sendEmbed( {
 		color: 3447003,
 
 		title: '__**Help**__',
@@ -25,6 +25,9 @@ exports.run = (bot, msg, params) => {
 			text: 'Hydra'
 		}
 	}).then(msg => log("Sent message: help menu")).catch(console.error);
+	msg.channel.sendMessage(":mailbox_with_mail: ")
+		.then(message => log(`Sent message: ${message.content}`))
+		.catch(console.error);
 
 };
 
