@@ -1,0 +1,22 @@
+<div class="columns">
+	<div class="column is-2" style="padding-left: 2rem">
+		<aside class="menu">
+			<p class="menu-label">Music Commands</p>
+			<ul class="menu-list">
+				<li><a{{#if condition}} class="is-active"{{/if}} href="/guild/{{guild}}/play">Play</a></li>
+				<li><a href="/guild/{{guild}}/skip">Skip</a></li>
+				<li><a href="/guild/{{guild}}/stop">Stop</a></li>
+				<li><a href="/guild/{{guild}}/queue">Queue</a></li>
+			</ul>
+			<p class="menu-label">Other Commands</p>
+			<ul class="menu-list">
+				<li><a href="/guild/{{guild}}/help">Help</a></li>
+				<li><a href="/guild/{{guild}}/ping">Ping</a></li>
+				<li><a href="/guild/{{guild}}/stats">Stats</a></li>
+			</ul>
+		</aside>
+	</div>
+	<div class="column">
+		{{{command}}}
+	</div>
+</div>

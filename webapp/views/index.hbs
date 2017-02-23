@@ -1,37 +1,21 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}!</p>
-
-<p>Guild ID: <b>{{doc.0.guildID}}</b></p>
-
-{{#if success}}
-	<section class="success">
-		<h2>Successful Validation</h2>
-	</section>
-{{else}}
-	{{#if errors}}
-		<section class="errors">
+{{#if user}}
+	<div class="columns">
+		<div class="column is-one-quarter" style="padding-left: 2rem">
+			<h4 class="title is-4">Guilds</h4>
 			<ul>
-				{{#each errors}}
-					<li>{{this.msg}}</li>
+				{{#each guilds as |value key|}}
+					<li><a href="/guild/{{value.id}}">{{value.name}}</a></li>
 				{{/each}}
+
 			</ul>
-		</section>
-	{{/if}}
-	<form action="/submit" method="POST">
-		<div class="input">
-			<label for="email">EMail</label>
-			<input type="email" name="email" placeholder="EMail">
 		</div>
-		<div class="input">
-			<label for="password">Password</label>
-			<input type="password" name="password" placeholder="Password">
+		<div class="column">
+			<p>Welcome to {{title}}!</p>
+
+			<p>Welcome <b>{{user.username}}</b></p>
+			<figure class="image is-32x32">
+				<img src="https://discordapp.com/api/users/{{user.id}}/avatars/{{user.avatar}}.jpg">
+			</figure>
 		</div>
-		<div class="input">
-			<label for="cpassword">Confirm Password</label>
-			<input type="password" name="cpassword" placeholder="Confirm Password">
-		</div>
-		<button type="submit">Submit</button>
-	</form>
+	</div>
 {{/if}}
-
-

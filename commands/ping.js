@@ -9,6 +9,7 @@ exports.run = (bot, msg, params) => {
             .then(msg => log(`Sent message: ${msg.content}`))
             .catch(console.error);
     });
+    
 
 };
 

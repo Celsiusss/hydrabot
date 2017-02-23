@@ -1,9 +1,27 @@
 <html>
 <head>
 	<title>{{title}}</title>
-	<link rel="stylesheet" href="/stylesheets/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.3.1/css/bulma.min.css">
 </head>
 <body>
+	<div class="level notification is-info">
+		<div class="level-left">
+			<div class="level-item">
+				<h1 class="title"><a href="/">{{title}}</a></h1>
+			</div>
+		</div>
+		<div class="level-right">
+			<div class="level-item">
+				{{#if user}}
+					<img height="32" width="32" style="border-radius: 50%" src="https://discordapp.com/api/users/{{user.id}}/avatars/{{user.avatar}}.jpg">
+					<div style="padding-left: .2rem; padding-right: 1rem">{{user.username}}</div>
+					<a class="button is-danger" href="/logout">Log Out</a>
+				{{else}}
+					<a class="button is-success" href="/auth">Log In with Discord</a>
+				{{/if}}
+			</div>
+		</div>
+	</div>
 	{{{body}}}
 </body>
 </html>
